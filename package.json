@@ -1,6 +1,6 @@
 {
   "name": "ag-restful",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "restful resource object builder",
   "main": "lib/ag/restful.js",
   "scripts": {

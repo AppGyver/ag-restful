@@ -8,3 +8,12 @@ module.exports =
       'coffeelint'
       'test'
     ]
+
+  compile:
+    files: [
+      '<%= files.src %>'
+    ]
+    tasks: [
+      'coffeelint'
+      'compile'
+    ]

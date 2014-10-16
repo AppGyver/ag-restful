@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "0.10"
+- '0.10'
 before_install: npm install -g grunt-cli
 after_success: grunt travis
 deploy:
@@ -10,3 +10,5 @@ deploy:
     tags: true
     all_branches: true
     repo: AppGyver/ag-restful
+  api_key:
+    secure: CzQNPJu1ztrkw5rp9NyTC9/QVr6xFl7Fm264xiJ0czi6mjUwtN97RIArKzbGbzkaTHwtZVQ+iyc3tb2ZE2/oujbWClQrgOpLKGPsmz/Nk32gBLk5YOljc6QS3INuQ3Z44fPZY9Pkveq1yghpZN17hwwnXtjGAAyLOuSYJeIbwNs=

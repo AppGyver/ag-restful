@@ -37,7 +37,7 @@ CatResource = restful {
     receive: api.response types.Property 'object', Cat
 
 
-describe "steroids.data", ->
+describe "ag-restful.ajax", ->
   app = null
   server = null
 
@@ -48,47 +48,49 @@ describe "steroids.data", ->
   afterEach ->
     server.close()
 
-  before ->
-    ajax.setDefaults headers: {hello: "world"}
+  describe "when setting default headers for ajax requests", ->
 
-  it "should send headers when getting", (done)->
-    app.get "/cats/1.json", (req, res)->
-      res.json({object: {name: "grafield"}})
-      expect(req.header("hello")).to.equal("world")
-      done()
+    before ->
+      ajax.setDefaults headers: {hello: "world"}
 
-    CatResource.find("1")
+    it "should send headers when getting", (done)->
+      app.get "/cats/1.json", (req, res)->
+        res.json({object: {name: "grafield"}})
+        expect(req.header("hello")).to.equal("world")
+        done()
 
-  it "should send headers when getting all", (done)->
-    app.get "/cats", (req, res)->
-      res.json({objects: [{name: "garfield"}, {name: "grumpy"}]})
-      expect(req.header("hello")).to.equal("world")
-      done()
+      CatResource.find("1")
 
-    CatResource.findAll()
+    it "should send headers when getting all", (done)->
+      app.get "/cats", (req, res)->
+        res.json({objects: [{name: "garfield"}, {name: "grumpy"}]})
+        expect(req.header("hello")).to.equal("world")
+        done()
 
-
-  it "should send headers when putting", (done)->
-    app.put "/cats/1.json", (req, res)->
-      res.json({object: {name: "grafield"}})
-      expect(req.header("hello")).to.equal("world")
-      done()
-
-    CatResource.update("1", {})
+      CatResource.findAll()
 
 
-  it "should send headers when posting", (done)->
-    app.post "/cats", (req, res)->
-      res.json({object: {name: "grafield"}})
-      expect(req.header("hello")).to.equal("world")
-      done()
+    it "should send headers when putting", (done)->
+      app.put "/cats/1.json", (req, res)->
+        res.json({object: {name: "grafield"}})
+        expect(req.header("hello")).to.equal("world")
+        done()
 
-    CatResource.create({name: "garfield"})
+      CatResource.update("1", {})
 
 
-  it "should send headers when deleting", (done)->
-    app.delete "/cats/1.json", (req, res)->
-      res.status(200).end()
-      done()
+    it "should send headers when posting", (done)->
+      app.post "/cats", (req, res)->
+        res.json({object: {name: "grafield"}})
+        expect(req.header("hello")).to.equal("world")
+        done()
 
-    CatResource.remove("1")
+      CatResource.create({name: "garfield"})
+
+
+    it "should send headers when deleting", (done)->
+      app.delete "/cats/1.json", (req, res)->
+        res.status(200).end()
+        done()
+
+      CatResource.remove("1")

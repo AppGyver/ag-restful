@@ -1,0 +1,23 @@
+{
+    "objects": [
+        {
+            "updated_at": "2014-04-09T10:44:24.121Z",
+            "created_at": "2014-04-09T10:44:24.121Z",
+            "description": "take out the trash",
+            "completed": false,
+            "ACL": {
+                "roles": [],
+                "users": [],
+                "others": {},
+                "can": []
+            },
+            "tags": [
+                ""
+            ],
+            "app_user_object_uid": "system",
+            "published": true,
+            "uid": "bltc95644acbfe2ca34",
+            "_version": 0
+        }
+    ]
+}

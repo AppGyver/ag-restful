@@ -41,12 +41,12 @@ describe "ag-restful.ajax", ->
   app = null
   server = null
 
-  beforeEach ->
+  beforeEach (done) ->
     app = express()
-    server = app.listen(port)
+    server = app.listen port, done
 
-  afterEach ->
-    server.close()
+  afterEach (done) ->
+    server.close done
 
   describe "when setting default headers for ajax requests", ->
 

@@ -14,21 +14,21 @@ restful = require '../src/ag/restful'
 
 describe "ag-restful", ->
   describe "Accessing data from a static REST backend", ->
-    port = 9876
+    TaskResource = null
+
+    port = 9001
     app = null
     server = null
 
-    beforeEach ->
+    beforeEach (done) ->
       app = express()
       app.use express.static "#{__dirname}/data"
-      server = app.listen(port)
+      server = app.listen port, done
 
-    afterEach ->
-      server.close()
+    afterEach (done) ->
+      server.close done
 
-    TaskResource = null
-    
-    beforeEach ->
+    before ->
       TaskResource = do ->
         TaskType = types.Object
           description: types.String
@@ -51,20 +51,21 @@ describe "ag-restful", ->
 
     describe "A user-defined TaskResource", ->
       it "can find all tasks", ->
-        TaskResource.findAll().should.eventually.be.an.array
+        TaskResource.findAll().then (tasks) ->
+          tasks.should.be.an.array
 
       describe "a single task", ->
         sampleTask = null
 
         beforeEach ->
-          sampleTask = TaskResource.find('bltc95644acbfe2ca34')
+          TaskResource.find('bltc95644acbfe2ca34').then (task) ->
+            sampleTask = task
 
         it "is an object", ->
-          sampleTask.should.eventually.be.an.object
+          sampleTask.should.be.an.object
 
         it "has a description", ->
-          sampleTask.should.eventually.have.property('description').equal "take out the trash"
-
+          sampleTask.should.have.property('description').equal "take out the trash"
 
   describe "Manipulating data in an express REST backend", ->
     CatResource = null
@@ -72,13 +73,13 @@ describe "ag-restful", ->
     app = null
     server = null
 
-    beforeEach ->
+    beforeEach (done) ->
       app = express()
       app.use bodyparser.json()
-      server = app.listen(port)
+      server = app.listen port, done
 
-    afterEach ->
-      server.close()
+    afterEach (done) ->
+      server.close done
 
     beforeEach ->
       CatResource = do ->

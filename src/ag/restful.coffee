@@ -136,7 +136,9 @@ rest =
         url,
         _.defaults({
             type: 'application/octet-stream'
-            data: if file.toString? then file.toString() else file
+            data: switch true
+              when Buffer.isBuffer file then file.toString()
+              else file
           },
           options || {}
         )

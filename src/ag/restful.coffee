@@ -150,17 +150,24 @@ rest =
       .then(validatorToPromised receive)
 
 restMethodBuilder = (defaultRequestOptions) ->
+  currentOptions = defaultRequestOptions || {}
 
   withOptions = (resourceBuilder) -> (resourceDescription) ->
     resourceBuilder deepDefaults resourceDescription, {
-      options: -> defaultRequestOptions
+      options: -> currentOptions
     }
+
+  getOptions: ->
+    currentOptions
+
+  setOptions: (options) ->
+    currentOptions = _.defaults options, defaultRequestOptions
+    currentOptions
 
   get: withOptions rest.getter
   post: withOptions rest.poster
   delete: withOptions rest.deleter
   put: withOptions rest.putter
-
   # NOTE: No default options applied
   upload: rest.uploader
 
@@ -179,9 +186,16 @@ restMethodBuilder = (defaultRequestOptions) ->
 
 # (
 #  defaultRequestOptions: { baseUrl?: String, headers?: Object },
-#  setup: ({
+#  doSetup: ({
 #    get, post, delete, put, response, request
 #  }) -> Object
 # ) -> Object
-module.exports = restful = (defaultRequestOptions, setup) ->
-  setup restMethodBuilder defaultRequestOptions
+module.exports = buildRestfulObject = (defaultRequestOptions, doSetup) ->
+  builder = restMethodBuilder defaultRequestOptions
+  restfulObject = doSetup builder
+  
+  # Amend object with setter and getter for options unless the setup already included them
+  restfulObject.getOptions ?= builder.getOptions
+  restfulObject.setOptions ?= builder.setOptions
+  
+  restfulObject

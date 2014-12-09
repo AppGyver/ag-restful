@@ -142,3 +142,48 @@ describe "ag-restful", ->
         CatResource.upload("http://localhost:#{port}/s3/bukkit/image.png", blob).should.be.fulfilled
         uploadedFiles.should.eventually.have.property 'file'
 
+
+    describe "when setting request options afterwards", ->
+      customHeader = null
+
+      beforeEach ->
+        customHeader = "random-string-#{Math.random()}"
+        CatResource.setOptions headers: { customHeader }
+
+      it "should send headers when getting", (done)->
+
+        app.get "/cats/1.json", (req, res)->
+          res.json({object: {name: "grafield"}})
+          req.header("customHeader").should.equal customHeader
+          done()
+
+        CatResource.find("1")
+
+
+      it "should send headers when putting", (done)->
+        app.put "/cats/1.json", (req, res)->
+          res.json({object: {name: "grafield"}})
+          req.header("customHeader").should.equal customHeader
+          done()
+
+        CatResource.update("1", {})
+
+
+      it "should send headers when posting", (done)->
+        app.post "/cats.json", (req, res)->
+          res.json({object: {name: "grafield"}})
+          req.header("customHeader").should.equal customHeader
+          done()
+
+        CatResource.create({name: "garfield"})
+
+
+      it "should send headers when deleting", (done)->
+        app.delete "/cats/1.json", (req, res)->
+          res.status(200).end()
+          req.header("customHeader").should.equal customHeader
+          done()
+
+        CatResource.remove("1")
+
+

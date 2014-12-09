@@ -169,5 +169,11 @@ restMethodBuilder = (options) ->
       # Merge sikrits back in to the request body root
       _.merge {}, requestBody, sikrits
 
-module.exports = restful = (options, apiDescriptor) ->
-  apiDescriptor restMethodBuilder options
+# (
+#  options: { baseUrl?: String, headers?: Object },
+#  setup: ({
+#    get, post, delete, put, response, request
+#  }) -> Object
+# ) -> Object
+module.exports = restful = (options, setup) ->
+  setup restMethodBuilder options

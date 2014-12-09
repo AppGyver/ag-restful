@@ -79,8 +79,10 @@ requestDataByMethod = (method) -> (path, options = {}) ->
     .then(responsetoResponseBody)
 
 module.exports = ajax =
+  # TODO: deprecate
   setDefaults: (config)->
     @config = config
+
   request: requestWithDefaults()
   get: requestDataByMethod 'get'
   post: requestDataByMethod 'post'

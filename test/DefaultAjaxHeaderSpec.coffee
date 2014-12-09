@@ -48,6 +48,11 @@ describe "ag-restful.ajax", ->
   afterEach (done) ->
     server.close done
 
+  describe "setDefaults", ->
+    # TODO: deprecate ajax.setDefaults
+    it.skip "is deprecated", ->
+      ajax.should.not.have.property 'setDefaults'
+
   describe "when setting default headers for ajax requests", ->
 
     before ->

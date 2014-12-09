@@ -59,11 +59,11 @@ urlify = (input) ->
 rest =
   # path: (args...) -> url
   # receive: (response) -> Validation data
-  # options: {}
+  # options: () -> Object
   getter: ({path, receive, options}) ->
     assert.func path, 'path'
     assert.func receive, 'receive'
-    assert.optionalObject options, 'options'
+    assert.optionalFunc options, 'options'
 
     (args...) ->
       # Use the last argument as query params if it's an object
@@ -77,22 +77,22 @@ rest =
       url = path (urlify urlArgs)...
 
       ajax
-        .request('get', url, _.defaults({query}, options || {}))
+        .request('get', url, _.defaults({query}, options?() || {}))
         .then(validatorToPromised receive)
 
   # path: (data) -> url
   # send: (data) -> Validation data
   # receive: (response) -> Validation response
-  # options: {}
+  # options: () -> Object
   poster: ({path, send, receive, options}) ->
     assert.func path, 'path'
     assert.func send, 'send'
     assert.func receive, 'receive'
-    assert.optionalObject options, 'options'
+    assert.optionalFunc options, 'options'
 
     doPostRequest = (data) ->
       url = path (urlify data)
-      ajax.request('post', url, _.defaults({data}, options || {}))
+      ajax.request('post', url, _.defaults({data}, options?() || {}))
 
     (data) ->
       validationToPromise(send data)
@@ -100,26 +100,30 @@ rest =
         .then(validatorToPromised receive)
 
   # path: (args...) -> url
-  # options: {}
-  deleter: ({path, options}) -> (args...) ->
-    url = path (urlify args)...
-    ajax
-      .del(url, options || {})
+  # options: () -> Object
+  deleter: ({path, options}) ->
+    assert.func path, 'path'
+    assert.optionalFunc options, 'options'
+
+    (args...) ->
+      url = path (urlify args)...
+      ajax
+        .del(url, options?() || {})
 
   # path: (args..., data) -> url
   # send: (data) -> Validation data
   # receive: (response) -> Validation data
-  # options: {}
+  # options: () -> Object
   putter: ({path, send, receive, options}) ->
     assert.func path, 'path'
     assert.func send, 'send'
     assert.func receive, 'receive'
-    assert.optionalObject options, 'options'
+    assert.optionalFunc options, 'options'
 
     doPutRequest = (args) ->
       url = path (urlify args)...
       (data) ->
-        ajax.request('put', url, _.defaults({data}, options || {}))
+        ajax.request('put', url, _.defaults({data}, options?() || {}))
 
     (args..., data) ->
       validationToPromise(send data)
@@ -145,14 +149,18 @@ rest =
       )
       .then(validatorToPromised receive)
 
-restMethodBuilder = (options) ->
-  withDefaultOptions = (resourceBuilder) -> (resourceDescription) ->
-    resourceBuilder deepDefaults resourceDescription, { options }
+restMethodBuilder = (defaultRequestOptions) ->
 
-  get: withDefaultOptions rest.getter
-  post: withDefaultOptions rest.poster
-  delete: withDefaultOptions rest.deleter
-  put: withDefaultOptions rest.putter
+  withOptions = (resourceBuilder) -> (resourceDescription) ->
+    resourceBuilder deepDefaults resourceDescription, {
+      options: -> defaultRequestOptions
+    }
+
+  get: withOptions rest.getter
+  post: withOptions rest.poster
+  delete: withOptions rest.deleter
+  put: withOptions rest.putter
+
   # NOTE: No default options applied
   upload: rest.uploader
 
@@ -170,10 +178,10 @@ restMethodBuilder = (options) ->
       _.merge {}, requestBody, sikrits
 
 # (
-#  options: { baseUrl?: String, headers?: Object },
+#  defaultRequestOptions: { baseUrl?: String, headers?: Object },
 #  setup: ({
 #    get, post, delete, put, response, request
 #  }) -> Object
 # ) -> Object
-module.exports = restful = (options, setup) ->
-  setup restMethodBuilder options
+module.exports = restful = (defaultRequestOptions, setup) ->
+  setup restMethodBuilder defaultRequestOptions

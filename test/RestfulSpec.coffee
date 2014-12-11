@@ -89,6 +89,8 @@ describe "ag-restful", ->
 
         restful {
           baseUrl: "http://localhost:#{port}"
+          headers:
+            'a-mandatory-default-header': 'very-important-value'
         }, (api) ->
 
           find: api.get
@@ -149,6 +151,12 @@ describe "ag-restful", ->
       beforeEach ->
         customHeader = "random-string-#{Math.random()}"
         CatResource.setOptions headers: { customHeader }
+
+      it "should respond to getOptions with defaults plus those that were set", ->
+        CatResource.getOptions().headers.should.deep.equal {
+          'a-mandatory-default-header': 'very-important-value'
+          customHeader: customHeader
+        }
 
       it "should send headers when getting", (done)->
 

@@ -161,7 +161,7 @@ restMethodBuilder = (defaultRequestOptions) ->
     currentOptions
 
   setOptions: (options) ->
-    currentOptions = _.defaults options, defaultRequestOptions
+    currentOptions = deepDefaults options, defaultRequestOptions
     currentOptions
 
   get: withOptions rest.getter

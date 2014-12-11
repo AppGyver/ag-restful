@@ -158,6 +158,22 @@ describe "ag-restful", ->
           customHeader: customHeader
         }
 
+      it "should allow overriding headers in default options", ->
+        CatResource.setOptions headers: {
+          'a-mandatory-default-header': 'an-overriding-value'
+        }
+        CatResource.getOptions().headers['a-mandatory-default-header'].should.equal 'an-overriding-value'
+
+      it "should revert back to defaults after removing overriding header", ->
+        CatResource.setOptions headers: {
+          'a-mandatory-default-header': 'an-overriding-value'
+          foo: 'bar'
+        }
+        CatResource.setOptions {}
+        CatResource.getOptions().headers.should.deep.equal {
+          'a-mandatory-default-header': 'very-important-value'
+        }
+
       it "should send headers when getting", (done)->
 
         app.get "/cats/1.json", (req, res)->

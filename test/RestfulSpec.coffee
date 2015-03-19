@@ -25,6 +25,11 @@ describe "ag-restful", ->
         app.use bodyparser.json()
         f app
 
+    localRestful = (f) ->
+      restful {
+        baseUrl: "http://localhost:#{port}"
+      }, f
+
     beforeEach ->
       CatType = types.Object
         name: types.String
@@ -66,13 +71,11 @@ describe "ag-restful", ->
               created: true
               name: 'hello, this is backend'
 
-          CatResource = restful {
-              baseUrl: "http://localhost:#{port}"
-            }, (api) ->
-              create: api.post
-                send: api.request types.projections.Property 'object'
-                path: (id) -> "/cats.json"
-                receive: api.response types.Property 'object', CatType
+          CatResource = localRestful (api) ->
+            create: api.post
+              send: api.request types.projections.Property 'object'
+              path: (id) -> "/cats.json"
+              receive: api.response types.Property 'object', CatType
 
           CatResource.create(name: 'irrelevant').then (cat) ->
             cat.should.have.property('name').equal 'hello, this is backend'
@@ -81,13 +84,10 @@ describe "ag-restful", ->
     describe "uploading a file", ->
       it "sends binary data to a fully specified url", ->
         withJsonServer (app) ->
-          CatResource = do ->
-            restful {
-              baseUrl: "http://localhost:#{port}"
-            }, (api) ->
-              upload: api.upload
-                receive: api.response
-                  201: types.Any
+          CatResource = localRestful (api) ->
+            upload: api.upload
+              receive: api.response
+                201: types.Any
 
           app.put "/s3/bukkit/image.png", (req, res)->
             form = new formidable.IncomingForm

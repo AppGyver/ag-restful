@@ -5,6 +5,7 @@ _ = {
 }
 
 assert = require 'assert-plus'
+types = require 'ag-types'
 ajax = require './restful/ajax'
 urlify = require './urlify'
 
@@ -59,14 +60,17 @@ rest =
 
   # path: (args...) -> url
   # options: () -> Object
-  deleter: ({path, options}) ->
+  # receive: (response) -> Validation data
+  deleter: ({path, options, receive}) ->
     assert.func path, 'path'
     assert.optionalFunc options, 'options'
+    assert.optionalFunc receive, 'receive'
 
     (args...) ->
       url = path (urlify args)...
       ajax
-        .del(url, options?() || {})
+        .request('del', url, options?() || {})
+        .then(validatorToPromised (receive || types.Optional(types.Any)))
 
   # path: (args..., data) -> url
   # send: (data) -> Validation data

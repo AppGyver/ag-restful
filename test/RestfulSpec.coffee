@@ -163,7 +163,7 @@ describe "ag-restful", ->
           CatResource.create({name: "garfield"}).should.eventually.equal customHeader
 
 
-      it.skip "should send headers when deleting", ->
+      it "should send headers when deleting", ->
         withJsonServer (app) ->
 
           app.delete "/cats/1.json", (req, res)->

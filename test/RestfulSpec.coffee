@@ -100,6 +100,38 @@ describe "ag-restful", ->
           CatResource.upload("http://localhost:#{port}/s3/bukkit/image.png", blob).then (files) ->
             files.should.have.property 'file'
 
+    describe "getOptions", ->
+      it "should have default headers if provided", ->
+        Resource = restful { headers: foo: 'bar' }, -> {}
+        Resource.getOptions().should.have.property('headers').deep.equal {
+          foo: 'bar'
+        }
+
+      it "should allow overriding headers with setOptions", ->
+        Resource = restful { headers: foo: 'bar' }, -> {}
+        Resource.setOptions headers: foo: 'not bar'
+        Resource.getOptions().should.have.property('headers').deep.equal {
+          foo: 'not bar'
+        }
+
+      it "should deep merge defaults with setOptions", ->
+        Resource = restful { headers: foo: 'bar' }, -> {}
+        Resource.setOptions headers: qux: 'baz'
+        Resource.getOptions().should.have.property('headers').deep.equal {
+          foo: 'bar'
+          qux: 'baz'
+        }
+
+      it "should revert back to defaults after clearing anything set with setOptions", ->
+        Resource = restful { headers: foo: 'bar' }, -> {}
+        Resource.setOptions headers: {
+          foo: 'not bar'
+          qux: 'baz'
+        }
+        Resource.setOptions {}
+        Resource.getOptions().should.have.property('headers').deep.equal {
+          foo: 'bar'
+        }
 
     describe.skip "when setting request options afterwards", ->
       customHeader = null
@@ -107,28 +139,6 @@ describe "ag-restful", ->
       beforeEach ->
         customHeader = "random-string-#{Math.random()}"
         CatResource.setOptions headers: { customHeader }
-
-      it "should respond to getOptions with defaults plus those that were set", ->
-        CatResource.getOptions().headers.should.deep.equal {
-          'a-mandatory-default-header': 'very-important-value'
-          customHeader: customHeader
-        }
-
-      it "should allow overriding headers in default options", ->
-        CatResource.setOptions headers: {
-          'a-mandatory-default-header': 'an-overriding-value'
-        }
-        CatResource.getOptions().headers['a-mandatory-default-header'].should.equal 'an-overriding-value'
-
-      it "should revert back to defaults after removing overriding header", ->
-        CatResource.setOptions headers: {
-          'a-mandatory-default-header': 'an-overriding-value'
-          foo: 'bar'
-        }
-        CatResource.setOptions {}
-        CatResource.getOptions().headers.should.deep.equal {
-          'a-mandatory-default-header': 'very-important-value'
-        }
 
       it "should send headers when getting", (done)->
 

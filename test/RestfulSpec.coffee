@@ -30,38 +30,9 @@ describe "ag-restful", ->
         baseUrl: "http://localhost:#{port}"
       }, f
 
-    beforeEach ->
-      CatType = types.Object
-        name: types.String
-        created: types.Optional types.Boolean
-      CatResource = do ->
-        restful {
-          baseUrl: "http://localhost:#{port}"
-          headers:
-            'a-mandatory-default-header': 'very-important-value'
-        }, (api) ->
-
-          find: api.get
-            path: (id) -> "/cats/#{id}.json"
-            receive: api.response types.Property 'object', CatType
-
-          update: api.put
-            send: api.request types.projections.Property 'object'
-            path: (id) -> "/cats/#{id}.json"
-            receive: api.response types.Property 'object', CatType
-
-          create: api.post
-            send: api.request types.projections.Property 'object'
-            path: (id) -> "/cats.json"
-            receive: api.response types.Property 'object', CatType
-
-          remove: api.delete
-            path: (id) -> "/cats/#{id}.json"
-            receive: api.response types.Property 'object', CatType
-
-          upload: api.upload
-            receive: api.response
-              201: types.Any
+    CatType = types.Object
+      name: types.String
+      created: types.Optional types.Boolean
 
     describe "creating a backend object", ->
       it "results in the object returned by the backend", ->
@@ -133,47 +104,81 @@ describe "ag-restful", ->
           foo: 'bar'
         }
 
-    describe.skip "when setting request options afterwards", ->
-      customHeader = null
+    describe "when setting request options afterwards", ->
 
-      beforeEach ->
-        customHeader = "random-string-#{Math.random()}"
-        CatResource.setOptions headers: { customHeader }
+      it "should send headers when getting", ->
+        withJsonServer (app) ->
+          app.get "/cats/1.json", (req, res)->
+            res.json {
+              object: req.header("customHeader")
+            }
 
-      it "should send headers when getting", (done)->
+          CatResource = localRestful (api) ->
+            find: api.get
+              path: (id) -> "/cats/#{id}.json"
+              receive: api.response types.Property 'object', types.Any
 
-        app.get "/cats/1.json", (req, res)->
-          res.json({object: {name: "grafield"}})
-          req.header("customHeader").should.equal customHeader
-          done()
+          customHeader = "random-string-#{Math.random()}"
+          CatResource.setOptions headers: { customHeader }
 
-        CatResource.find("1")
-
-
-      it "should send headers when putting", (done)->
-        app.put "/cats/1.json", (req, res)->
-          res.json({object: {name: "grafield"}})
-          req.header("customHeader").should.equal customHeader
-          done()
-
-        CatResource.update("1", {})
+          CatResource.find("1").should.eventually.equal customHeader
 
 
-      it "should send headers when posting", (done)->
-        app.post "/cats.json", (req, res)->
-          res.json({object: {name: "grafield"}})
-          req.header("customHeader").should.equal customHeader
-          done()
+      it "should send headers when putting", ->
+        withJsonServer (app) ->
+          app.put "/cats/1.json", (req, res)->
+            res.json {
+              object: req.header("customHeader")
+            }
 
-        CatResource.create({name: "garfield"})
+          CatResource = localRestful (api) ->
+            update: api.put
+              send: api.request types.projections.Property 'object'
+              path: (id) -> "/cats/#{id}.json"
+              receive: api.response types.Property 'object', types.Any
+
+          customHeader = "random-string-#{Math.random()}"
+          CatResource.setOptions headers: { customHeader }
+
+          CatResource.update("1", {}).should.eventually.equal customHeader
 
 
-      it "should send headers when deleting", (done)->
-        app.delete "/cats/1.json", (req, res)->
-          res.status(200).end()
-          req.header("customHeader").should.equal customHeader
-          done()
+      it "should send headers when posting", ->
+        withJsonServer (app) ->
 
-        CatResource.remove("1")
+          app.post "/cats.json", (req, res)->
+            res.json {
+              object: req.header("customHeader")
+            }
+
+          CatResource = localRestful (api) ->
+            create: api.post
+              send: api.request types.projections.Property 'object'
+              path: (id) -> "/cats.json"
+              receive: api.response types.Property 'object', types.Any
+
+          customHeader = "random-string-#{Math.random()}"
+          CatResource.setOptions headers: { customHeader }
+
+          CatResource.create({name: "garfield"}).should.eventually.equal customHeader
+
+
+      it.skip "should send headers when deleting", ->
+        withJsonServer (app) ->
+
+          app.delete "/cats/1.json", (req, res)->
+            res.json {
+              object: req.header("customHeader")
+            }
+
+          CatResource = localRestful (api) ->
+            remove: api.delete
+              path: (id) -> "/cats/#{id}.json"
+              receive: api.response types.Property 'object', types.Any
+
+          customHeader = "random-string-#{Math.random()}"
+          CatResource.setOptions headers: { customHeader }
+
+          CatResource.remove("1").should.eventually.equal customHeader
 
 

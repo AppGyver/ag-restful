@@ -5,8 +5,6 @@ _ = {
 }
 
 assert = require 'assert-plus'
-Promise = require 'bluebird'
-
 ajax = require './restful/ajax'
 urlify = require './urlify'
 

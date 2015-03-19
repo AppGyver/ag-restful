@@ -1,5 +1,4 @@
 _ = {
-  mapValues: require 'lodash-node/modern/objects/mapValues'
   partialRight: require 'lodash-node/modern/functions/partialRight'
   merge: require 'lodash-node/modern/objects/merge'
   defaults: require 'lodash-node/modern/objects/defaults'
@@ -11,6 +10,7 @@ types = require 'ag-types'
 {Failure} = require 'data.validation'
 
 ajax = require './restful/ajax'
+urlify = require './urlify'
 
 # Validation a -> Promise a
 validationToPromise = (validation) ->
@@ -47,14 +47,6 @@ responseValidator = (responseDataValidator) ->
         Failure [response.error]
       else
         validateResponse response
-
-urlify = (input) ->
-  return '' unless input?
-
-  switch (Object::toString.call input)
-    when '[object Object]' then _.mapValues input, urlify
-    when '[object Array]' then (urlify item for item in input)
-    else encodeURIComponent input
 
 rest =
   # path: (args...) -> url
@@ -193,9 +185,9 @@ restMethodBuilder = (defaultRequestOptions) ->
 module.exports = buildRestfulObject = (defaultRequestOptions, doSetup) ->
   builder = restMethodBuilder defaultRequestOptions
   restfulObject = doSetup builder
-  
+
   # Amend object with setter and getter for options unless the setup already included them
   restfulObject.getOptions ?= builder.getOptions
   restfulObject.setOptions ?= builder.setOptions
-  
+
   restfulObject

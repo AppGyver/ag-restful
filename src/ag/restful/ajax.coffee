@@ -65,25 +65,15 @@ request = (method, path, options = {}) ->
 
     requestBuilder
 
-requestWithDefaults = ()-> (method, path, options = {}) ->
-  @config ||= {}
-  mergedOptions = _.merge(options, @config)
-
-  request(method, path, mergedOptions)
-
 requestDataByMethod = (method) -> (path, options = {}) ->
-  @config ||= {}
-  mergedOptions = _.merge(options, @config)
-
-  request(method, path, mergedOptions)
+  request(method, path, options)
     .then(responsetoResponseBody)
 
 module.exports = ajax =
-  # TODO: deprecate
-  setDefaults: (config)->
-    @config = config
+  # Returns the raw HTTP request
+  request: request
 
-  request: requestWithDefaults()
+  # These will always return the request data
   get: requestDataByMethod 'get'
   post: requestDataByMethod 'post'
   del: requestDataByMethod 'del'

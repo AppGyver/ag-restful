@@ -50,10 +50,10 @@ describe "ag-restful.ajax", ->
 
   describe "setDefaults", ->
     # TODO: deprecate ajax.setDefaults
-    it.skip "is deprecated", ->
+    it "is deprecated", ->
       ajax.should.not.have.property 'setDefaults'
 
-  describe "when setting default headers for ajax requests", ->
+  describe.skip "when setting default headers for ajax requests", ->
 
     before ->
       ajax.setDefaults headers: {hello: "world"}

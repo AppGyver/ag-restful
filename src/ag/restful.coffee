@@ -6,47 +6,15 @@ _ = {
 
 assert = require 'assert-plus'
 Promise = require 'bluebird'
-types = require 'ag-types'
-{Failure} = require 'data.validation'
 
 ajax = require './restful/ajax'
 urlify = require './urlify'
 
-# Validation a -> Promise a
-validationToPromise = (validation) ->
-  validation.fold(
-    (errors) -> Promise.reject new Error JSON.stringify(errors)
-    (value) -> Promise.resolve value
-  )
-
-# (a -> Validation b) -> (a -> Promise b)
-validatorToPromised = (validator) ->
-  (args...) ->
-    validationToPromise validator(args...)
+validationToPromise = require './transformers/validation-to-promise'
+validatorToPromised = require './transformers/validator-to-promised'
+responseValidator = require './transformers/data-validator-to-response-validator'
 
 deepDefaults = _.partialRight _.merge, _.defaults
-
-validatorToResponseValidator = (validator) ->
-  if typeof validator is 'function'
-    types.OneOf [
-      types.Property 'body', validator
-      types.Property 'text', validator
-    ]
-  else
-    types.OneOf (
-      for responseCode, responseBodyValidator of validator
-        # NOTE: This checks for the contents but not response code
-        # TODO: Check for response status
-        validatorToResponseValidator responseBodyValidator
-    )
-# Validator data | Map responseCode (Validator data) -> Validator response
-responseValidator = (responseDataValidator) ->
-  do (validateResponse = validatorToResponseValidator responseDataValidator) ->
-    (response) ->
-      if response.error
-        Failure [response.error]
-      else
-        validateResponse response
 
 rest =
   # path: (args...) -> url

@@ -8,25 +8,30 @@ chai = require('chai')
 chai.use(require 'chai-as-promised')
 chai.should()
 
-
 types = require 'ag-types'
 restful = require '../src/ag/restful'
+
+withServerAt = (port, f) ->
+  app = express()
+  (new Promise (resolve) ->
+    server = app.listen port, ->
+      resolve server
+  ).then (server) ->
+    (new Promise (resolve, reject) ->
+      Promise.resolve(f(app)).then(resolve, reject)
+    ).finally ->
+      new Promise (resolve) ->
+        server.close resolve
 
 describe "ag-restful", ->
   describe "Accessing data from a static REST backend", ->
     TaskResource = null
-
     port = 9001
-    app = null
-    server = null
 
-    beforeEach (done) ->
-      app = express()
-      app.use express.static "#{__dirname}/data"
-      server = app.listen port, done
-
-    afterEach (done) ->
-      server.close done
+    withStaticServer = (f) ->
+      withServerAt port, (app) ->
+        app.use express.static "#{__dirname}/data"
+        f(app)
 
     before ->
       TaskResource = do ->
@@ -37,7 +42,6 @@ describe "ag-restful", ->
         return restful {
           baseUrl: "http://localhost:#{port}/task"
         }, (api) ->
-
           findAll: api.get
             path: -> '/objects.json'
             receive: api.response types.Property 'objects', types.List TaskType
@@ -51,21 +55,17 @@ describe "ag-restful", ->
 
     describe "A user-defined TaskResource", ->
       it "can find all tasks", ->
-        TaskResource.findAll().then (tasks) ->
-          tasks.should.be.an.array
+        withStaticServer ->
+          TaskResource.findAll().should.eventually.be.an 'array'
 
       describe "a single task", ->
-        sampleTask = null
-
-        beforeEach ->
-          TaskResource.find('bltc95644acbfe2ca34').then (task) ->
-            sampleTask = task
-
         it "is an object", ->
-          sampleTask.should.be.an.object
+          withStaticServer ->
+            TaskResource.find('bltc95644acbfe2ca34').should.eventually.be.an 'object'
 
         it "has a description", ->
-          sampleTask.should.have.property('description').equal "take out the trash"
+          withStaticServer ->
+            TaskResource.find('bltc95644acbfe2ca34').should.eventually.have.property('description').equal "take out the trash"
 
   describe "Manipulating data in an express REST backend", ->
     CatResource = null

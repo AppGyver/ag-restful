@@ -60,6 +60,23 @@ describe "ag-restful", ->
           foo: 'bar'
         }
 
+    describe "API descriptor", ->
+      it "determines a group of methods on the output object", ->
+        restful({}, -> {
+          foo: ->
+          bar: ->
+        }).should.include.keys ['foo', 'bar']
+
+      it "receives a restful API builder", ->
+        restful {}, (api) ->
+          api.should.be.an 'object'
+
+      describe "API builder", ->
+        it "supports get, post, delete, put, request and response", ->
+          restful {}, (api) ->
+            api.should.include.keys ['get', 'post', 'delete', 'put', 'request', 'response']
+
+
   describe "Manipulating data in an express REST backend", ->
     CatResource = null
     CatType = null

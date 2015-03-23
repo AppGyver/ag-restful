@@ -13,6 +13,53 @@ restful = require '../src/ag/restful'
 withServerAt = require './with-server'
 
 describe "ag-restful", ->
+  it "is a function", ->
+    restful.should.be.a 'function'
+
+  it "accepts options and a function and returns an object", ->
+    restful({}, -> {}).should.be.an 'object'
+
+  describe "restful()", ->
+
+    it "has getOptions()", ->
+      restful({}, -> {}).should.have.property('getOptions').be.a 'function'
+
+    it "has setOptions()", ->
+      restful({}, -> {}).should.have.property('setOptions').be.a 'function'
+
+    describe "getOptions()", ->
+      it "should have default headers if provided", ->
+        Resource = restful { headers: foo: 'bar' }, -> {}
+        Resource.getOptions().should.have.property('headers').deep.equal {
+          foo: 'bar'
+        }
+
+      it "should allow overriding headers with setOptions", ->
+        Resource = restful { headers: foo: 'bar' }, -> {}
+        Resource.setOptions headers: foo: 'not bar'
+        Resource.getOptions().should.have.property('headers').deep.equal {
+          foo: 'not bar'
+        }
+
+      it "should deep merge defaults with setOptions", ->
+        Resource = restful { headers: foo: 'bar' }, -> {}
+        Resource.setOptions headers: qux: 'baz'
+        Resource.getOptions().should.have.property('headers').deep.equal {
+          foo: 'bar'
+          qux: 'baz'
+        }
+
+      it "should revert back to defaults after clearing anything set with setOptions", ->
+        Resource = restful { headers: foo: 'bar' }, -> {}
+        Resource.setOptions headers: {
+          foo: 'not bar'
+          qux: 'baz'
+        }
+        Resource.setOptions {}
+        Resource.getOptions().should.have.property('headers').deep.equal {
+          foo: 'bar'
+        }
+
   describe "Manipulating data in an express REST backend", ->
     CatResource = null
     CatType = null
@@ -70,39 +117,6 @@ describe "ag-restful", ->
           blob = fs.readFileSync "#{__dirname}/data/kitty.png"
           CatResource.upload("http://localhost:#{port}/s3/bukkit/image.png", blob).then (files) ->
             files.should.have.property 'file'
-
-    describe "getOptions", ->
-      it "should have default headers if provided", ->
-        Resource = restful { headers: foo: 'bar' }, -> {}
-        Resource.getOptions().should.have.property('headers').deep.equal {
-          foo: 'bar'
-        }
-
-      it "should allow overriding headers with setOptions", ->
-        Resource = restful { headers: foo: 'bar' }, -> {}
-        Resource.setOptions headers: foo: 'not bar'
-        Resource.getOptions().should.have.property('headers').deep.equal {
-          foo: 'not bar'
-        }
-
-      it "should deep merge defaults with setOptions", ->
-        Resource = restful { headers: foo: 'bar' }, -> {}
-        Resource.setOptions headers: qux: 'baz'
-        Resource.getOptions().should.have.property('headers').deep.equal {
-          foo: 'bar'
-          qux: 'baz'
-        }
-
-      it "should revert back to defaults after clearing anything set with setOptions", ->
-        Resource = restful { headers: foo: 'bar' }, -> {}
-        Resource.setOptions headers: {
-          foo: 'not bar'
-          qux: 'baz'
-        }
-        Resource.setOptions {}
-        Resource.getOptions().should.have.property('headers').deep.equal {
-          foo: 'bar'
-        }
 
     describe "when setting request options afterwards", ->
 

@@ -109,6 +109,17 @@ describe "ag-restful", ->
                 bar: 'qux'
               }
 
+          it "invalidates received json body with the given type", ->
+            r = localRestful (api) ->
+              foo: api.get
+                receive: api.response types.Boolean
+                path: -> '/foo'
+
+            withJsonServer (app) ->
+              app.get '/foo', (req, res) ->
+                res.json "not a boolean"
+
+              r.foo().should.be.rejected
 
   describe "Manipulating data in an express REST backend", ->
     CatResource = null

@@ -3,7 +3,7 @@ chai.use(require 'chai-as-promised')
 chai.should()
 
 types = require 'ag-types'
-restful = require '../src'
+restful = require('../src')(require 'bluebird')
 
 withServerAt = require './with-server'
 express = require 'express'

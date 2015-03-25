@@ -2,22 +2,24 @@ _ = {
   merge: require 'lodash-node/modern/objects/merge'
 }
 buildRequest = require './http/build-request'
-runRequest = require './http/run-request'
 extractResponseBody = require './http/extract-response-body'
 
-request = (method, path, options = {}) ->
-  runRequest buildRequest(method, path, options)
+module.exports = (Promise) ->
+  runRequest = require('./http/run-request')(Promise)
 
-requestDataByMethod = (method) -> (path, options = {}) ->
-  request(method, path, options)
-    .then(extractResponseBody)
+  request = (method, path, options = {}) ->
+    runRequest buildRequest(method, path, options)
 
-module.exports = http =
-  # Returns the raw HTTP request
-  request: request
+  requestDataByMethod = (method) -> (path, options = {}) ->
+    request(method, path, options)
+      .then(extractResponseBody)
 
-  # These will always return the request data
-  get: requestDataByMethod 'get'
-  post: requestDataByMethod 'post'
-  del: requestDataByMethod 'del'
-  put: requestDataByMethod 'put'
+  return http =
+    # Returns the raw HTTP request
+    request: request
+
+    # These will always return the request data
+    get: requestDataByMethod 'get'
+    post: requestDataByMethod 'post'
+    del: requestDataByMethod 'del'
+    put: requestDataByMethod 'put'

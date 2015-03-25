@@ -5,6 +5,10 @@ PORT = require './http/port'
 
 module.exports = withServer = (f) ->
   app = express()
+
+  # Match server endpoint constructor signatures with http request constructor signature
+  app.del = app.delete
+
   (new Promise (resolve) ->
     server = app.listen PORT, ->
       resolve server

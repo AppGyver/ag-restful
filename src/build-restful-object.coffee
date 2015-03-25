@@ -5,11 +5,7 @@ _ = {
 }
 deepDefaults = _.partialRight _.merge, _.defaults
 
-responseValidator = require './validation/validate-response-body'
-
-module.exports = (http) ->
-  buildRestful = require('./build-restful-method')(http)
-
+module.exports = (buildRestful, validateResponseBody) ->
   ###
   (defaultRequestOptions: { baseUrl?: String, headers?: Object })
   -> {
@@ -38,7 +34,7 @@ module.exports = (http) ->
     # NOTE: No default options applied
     upload: buildRestful.uploader
 
-    response: responseValidator
+    response: validateResponseBody
     request: (projection) -> (data) ->
       # Double-underscored properties are sikrits and not data
       # Stash sikrits away

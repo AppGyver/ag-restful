@@ -6,10 +6,7 @@ assert = require 'assert-plus'
 types = require 'ag-types'
 urlify = require './urlify'
 
-validationToPromise = require './validation/validation-to-promise'
-validatorToPromised = require './validation/validator-to-promised'
-
-module.exports = (http) ->
+module.exports = (http, validations) ->
   # path: (args...) -> url
   # receive: (response) -> Validation data
   # options: () -> Object
@@ -31,7 +28,7 @@ module.exports = (http) ->
 
       http
         .request('get', url, _.defaults({query}, options?() || {}))
-        .then(validatorToPromised receive)
+        .then(validations.validatorToPromised receive)
 
   # path: (data) -> url
   # send: (data) -> Validation data
@@ -48,9 +45,9 @@ module.exports = (http) ->
       http.request('post', url, _.defaults({data}, options?() || {}))
 
     (data) ->
-      validationToPromise(send data)
+      validations.validationToPromise(send data)
         .then(doPostRequest)
-        .then(validatorToPromised receive)
+        .then(validations.validatorToPromised receive)
 
   # path: (args...) -> url
   # options: () -> Object
@@ -64,7 +61,7 @@ module.exports = (http) ->
       url = path (urlify args)...
       http
         .request('del', url, options?() || {})
-        .then(validatorToPromised (receive || types.Optional(types.Any)))
+        .then(validations.validatorToPromised (receive || types.Optional(types.Any)))
 
   # path: (args..., data) -> url
   # send: (data) -> Validation data
@@ -82,9 +79,9 @@ module.exports = (http) ->
         http.request('put', url, _.defaults({data}, options?() || {}))
 
     (args..., data) ->
-      validationToPromise(send data)
+      validations.validationToPromise(send data)
         .then(doPutRequest(args))
-        .then(validatorToPromised receive)
+        .then(validations.validatorToPromised receive)
 
   # receive: (response) -> Validation data
   uploader: ({receive}) ->
@@ -103,4 +100,4 @@ module.exports = (http) ->
           options || {}
         )
       )
-      .then(validatorToPromised receive)
+      .then(validations.validatorToPromised receive)

@@ -136,7 +136,9 @@ describe "ag-restful", ->
                   }
                 else
                   # Backend acknowledges it has accepted job
-                  res.status(202).send { 'request_id': 123 }
+                  res.set('x-proxy-request-id', 123)
+                  res.status(202)
+                  res.end()
 
               r.foo().should.eventually.deep.equal {
                 bar: 'qux'

@@ -1,5 +1,5 @@
-http = require './ag/http'
-restful = require('./ag/build-restful-object')(http)
+http = require './http'
+restful = require('./build-restful-object')(http)
 restful.ajax = http
 
 module.exports = restful

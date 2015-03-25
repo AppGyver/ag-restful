@@ -69,7 +69,7 @@ requestDataByMethod = (method) -> (path, options = {}) ->
   request(method, path, options)
     .then(responsetoResponseBody)
 
-module.exports = ajax =
+module.exports = http =
   # Returns the raw HTTP request
   request: request
 

@@ -12,6 +12,7 @@ restful = require('../src')(Promise)
 
 withServer = require './with-server'
 localhost = require './http/localhost'
+asyncJob = require './http/async-job'
 
 describe "ag-restful", ->
   it "is a function", ->
@@ -125,17 +126,10 @@ describe "ag-restful", ->
                 path: -> '/foo'
 
             withJsonServer (app) ->
-              app.get '/foo', (req, res) ->
-                if req.get('x-proxy-request-id') is 123
-                  # Backend responds with actual content once job is complete
-                  res.json {
-                    bar: 'qux'
-                  }
-                else
-                  # Backend acknowledges it has accepted job
-                  res.set('x-proxy-request-id', 123)
-                  res.status(202)
-                  res.end()
+              app.get '/foo', asyncJob (req, res) ->
+                res.json {
+                  bar: 'qux'
+                }
 
               r.foo().should.eventually.deep.equal {
                 bar: 'qux'

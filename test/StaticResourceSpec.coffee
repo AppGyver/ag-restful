@@ -7,11 +7,11 @@ restful = require('../src')(require 'bluebird')
 
 withServer = require './with-server'
 express = require 'express'
+localhost = require './http/localhost'
 
 describe "ag-restful", ->
   describe "Accessing data from a static REST backend", ->
     TaskResource = null
-    port = 9001
 
     withStaticServer = (f) ->
       withServer (app) ->
@@ -25,7 +25,7 @@ describe "ag-restful", ->
           created: types.Optional types.Boolean
 
         return restful {
-          baseUrl: "http://localhost:#{port}/task"
+          baseUrl: "#{localhost}/task"
         }, (api) ->
           findAll: api.get
             path: -> '/objects.json'

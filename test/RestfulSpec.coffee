@@ -11,6 +11,7 @@ types = require 'ag-types'
 restful = require('../src')(Promise)
 
 withServer = require './with-server'
+localhost = require './http/localhost'
 
 describe "ag-restful", ->
   it "is a function", ->
@@ -19,10 +20,6 @@ describe "ag-restful", ->
   it "accepts options and a function and returns an object", ->
     restful({}, -> {}).should.be.an 'object'
 
-  port = 9001
-  app = null
-  server = null
-
   withJsonServer = (f) ->
     withServer (app) ->
       app.use bodyparser.json()
@@ -30,7 +27,7 @@ describe "ag-restful", ->
 
   localRestful = (f) ->
     restful {
-      baseUrl: "http://localhost:#{port}"
+      baseUrl: localhost
     }, f
 
   describe "restful()", ->
@@ -186,7 +183,7 @@ describe "ag-restful", ->
               res.end()
 
           blob = fs.readFileSync "#{__dirname}/data/kitty.png"
-          CatResource.upload("http://localhost:#{port}/s3/bukkit/image.png", blob).then (files) ->
+          CatResource.upload("#{localhost}/s3/bukkit/image.png", blob).then (files) ->
             files.should.have.property 'file'
 
     describe "when setting request options afterwards", ->

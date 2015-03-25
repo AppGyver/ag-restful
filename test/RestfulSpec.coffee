@@ -19,6 +19,20 @@ describe "ag-restful", ->
   it "accepts options and a function and returns an object", ->
     restful({}, -> {}).should.be.an 'object'
 
+  port = 9876
+  app = null
+  server = null
+
+  withJsonServer = (f) ->
+    withServerAt port, (app) ->
+      app.use bodyparser.json()
+      f app
+
+  localRestful = (f) ->
+    restful {
+      baseUrl: "http://localhost:#{port}"
+    }, f
+
   describe "restful()", ->
 
     it "has getOptions()", ->
@@ -76,23 +90,29 @@ describe "ag-restful", ->
           restful {}, (api) ->
             api.should.include.keys ['get', 'post', 'delete', 'put', 'request', 'response']
 
+        describe "get", ->
+          it "creates a getter method", ->
+            r = localRestful (api) ->
+              foo: api.get
+                receive: api.response types.Any
+                path: -> '/foo'
+
+            r.foo.should.be.a 'function'
+
+            withJsonServer (app) ->
+              app.get '/foo', (req, res) ->
+                res.json {
+                  bar: 'qux'
+                }
+
+              r.foo().should.eventually.deep.equal {
+                bar: 'qux'
+              }
+
 
   describe "Manipulating data in an express REST backend", ->
     CatResource = null
     CatType = null
-    port = 9876
-    app = null
-    server = null
-
-    withJsonServer = (f) ->
-      withServerAt port, (app) ->
-        app.use bodyparser.json()
-        f app
-
-    localRestful = (f) ->
-      restful {
-        baseUrl: "http://localhost:#{port}"
-      }, f
 
     CatType = types.Object
       name: types.String

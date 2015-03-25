@@ -3,23 +3,14 @@ _ = {
 }
 buildRequest = require './http/build-request'
 runRequest = require './http/run-request'
-
-responsetoResponseBody = (response) ->
-  if response.error
-    throw new Error response.status
-  else if response.body
-    response.body
-  else if response.text
-    response.text
-  else
-    throw new Error "Empty response"
+extractResponseBody = require './http/extract-response-body'
 
 request = (method, path, options = {}) ->
   runRequest buildRequest(method, path, options)
 
 requestDataByMethod = (method) -> (path, options = {}) ->
   request(method, path, options)
-    .then(responsetoResponseBody)
+    .then(extractResponseBody)
 
 module.exports = http =
   # Returns the raw HTTP request

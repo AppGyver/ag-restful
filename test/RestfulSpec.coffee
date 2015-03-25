@@ -121,6 +121,27 @@ describe "ag-restful", ->
 
               r.foo().should.be.rejected
 
+          it "transparently handles asynchronous jobs", ->
+            r = localRestful (api) ->
+              foo: api.get
+                receive: api.response types.Any
+                path: -> '/foo'
+
+            withJsonServer (app) ->
+              app.get '/foo', (req, res) ->
+                if req.get('x-proxy-request-id') is 123
+                  # Backend responds with actual content once job is complete
+                  res.json {
+                    bar: 'qux'
+                  }
+                else
+                  # Backend acknowledges it has accepted job
+                  res.status(202).send { 'request_id': 123 }
+
+              r.foo().should.eventually.deep.equal {
+                bar: 'qux'
+              }
+
   describe "Manipulating data in an express REST backend", ->
     CatResource = null
     CatType = null

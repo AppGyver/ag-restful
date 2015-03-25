@@ -1,18 +1,8 @@
-
-Promise = require 'bluebird'
 _ = {
   merge: require 'lodash-node/modern/objects/merge'
 }
 buildRequest = require './http/build-request'
-
-# requestBuilder -> Promise res
-requestBuilderToResponsePromise = (requestBuilder) ->
-  new Promise (resolve, reject) ->
-    requestBuilder.end (err, res) ->
-      if err
-        reject err
-      else
-        resolve res
+runRequest = require './http/run-request'
 
 responsetoResponseBody = (response) ->
   if response.error
@@ -25,7 +15,7 @@ responsetoResponseBody = (response) ->
     throw new Error "Empty response"
 
 request = (method, path, options = {}) ->
-  requestBuilderToResponsePromise buildRequest(method, path, options)
+  runRequest buildRequest(method, path, options)
 
 requestDataByMethod = (method) -> (path, options = {}) ->
   request(method, path, options)

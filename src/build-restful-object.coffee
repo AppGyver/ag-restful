@@ -5,7 +5,7 @@ _ = {
 }
 deepDefaults = _.partialRight _.merge, _.defaults
 
-responseValidator = require './transformers/data-validator-to-response-validator'
+responseValidator = require './validation/validate-response-body'
 
 module.exports = (http) ->
   buildRestful = require('./build-restful-method')(http)

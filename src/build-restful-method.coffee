@@ -6,8 +6,8 @@ assert = require 'assert-plus'
 types = require 'ag-types'
 urlify = require './urlify'
 
-validationToPromise = require './transformers/validation-to-promise'
-validatorToPromised = require './transformers/validator-to-promised'
+validationToPromise = require './validation/validation-to-promise'
+validatorToPromised = require './validation/validator-to-promised'
 
 module.exports = (http) ->
   # path: (args...) -> url

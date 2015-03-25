@@ -10,7 +10,7 @@ chai.should()
 types = require 'ag-types'
 restful = require('../src')(Promise)
 
-withServerAt = require './with-server'
+withServer = require './with-server'
 
 describe "ag-restful", ->
   it "is a function", ->
@@ -19,12 +19,12 @@ describe "ag-restful", ->
   it "accepts options and a function and returns an object", ->
     restful({}, -> {}).should.be.an 'object'
 
-  port = 9876
+  port = 9001
   app = null
   server = null
 
   withJsonServer = (f) ->
-    withServerAt port, (app) ->
+    withServer (app) ->
       app.use bodyparser.json()
       f app
 

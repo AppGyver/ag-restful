@@ -5,7 +5,7 @@ chai.should()
 types = require 'ag-types'
 restful = require('../src')(require 'bluebird')
 
-withServerAt = require './with-server'
+withServer = require './with-server'
 express = require 'express'
 
 describe "ag-restful", ->
@@ -14,7 +14,7 @@ describe "ag-restful", ->
     port = 9001
 
     withStaticServer = (f) ->
-      withServerAt port, (app) ->
+      withServer (app) ->
         app.use express.static "#{__dirname}/data"
         f(app)
 

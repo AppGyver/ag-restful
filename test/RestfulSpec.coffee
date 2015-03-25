@@ -8,7 +8,7 @@ chai.use(require 'chai-as-promised')
 chai.should()
 
 types = require 'ag-types'
-restful = require '../src/ag/restful'
+restful = require '../src'
 
 withServerAt = require './with-server'
 

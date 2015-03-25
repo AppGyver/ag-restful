@@ -1,8 +1,9 @@
-superagent = require 'superagent'
+
 Promise = require 'bluebird'
 _ = {
   merge: require 'lodash-node/modern/objects/merge'
 }
+buildRequest = require './http/build-request'
 
 # requestBuilder -> Promise res
 requestBuilderToResponsePromise = (requestBuilder) ->
@@ -24,46 +25,7 @@ responsetoResponseBody = (response) ->
     throw new Error "Empty response"
 
 request = (method, path, options = {}) ->
-  requestBuilderToResponsePromise do ->
-    if !superagent[method]?
-      throw new Error "No such request builder method: #{method}"
-
-    requestBuilder = superagent[method](
-      if options.baseUrl?
-        [options.baseUrl, path].join ''
-      else
-        path
-    )
-
-    if options.headers
-      for header, value of options.headers || {}
-        requestBuilder.set header, value
-
-    if options.query
-      requestBuilder.query options.query
-
-    if options.type?
-      requestBuilder.type options.type
-
-    if options.accept?
-      requestBuilder.accept options.accept
-
-    # Accept multipart data for file uploads
-    if options.parts?
-      for part in options.parts
-        partBuilder = requestBuilder.part()
-        for header, value of part.headers || {}
-          partBuilder.set header, value
-        if part.data?
-          partBuilder.write part.data
-    else if options.data?
-      requestBuilder.send options.data
-
-    # If buffer() is defined on requestBuilder, we can explicitly request buffering
-    if options.buffer && requestBuilder.buffer?
-      requestBuilder.buffer()
-
-    requestBuilder
+  requestBuilderToResponsePromise buildRequest(method, path, options)
 
 requestDataByMethod = (method) -> (path, options = {}) ->
   request(method, path, options)

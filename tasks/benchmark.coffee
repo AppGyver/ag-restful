@@ -26,7 +26,15 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'benchmark:http', ->
     done = @async()
-    runRequest = requestRunner getBenchmarkConfig()
-    time(runRequest).then (v) ->
-      console.log v
+    config = getBenchmarkConfig()
+    runRequest = requestRunner config
+    grunt.log.ok """
+    Benchmarking endpoint:    #{config.BENCHMARK_URL}
+    Concurrent requests:      #{config.CONCURRENCY}
+    Requests to complete:     #{config.REQUESTS}
+    """
+    time(runRequest).then (totalTime) ->
+      grunt.log.ok """
+      Total time to completion: #{totalTime}
+      """
       done()

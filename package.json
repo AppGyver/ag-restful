@@ -5,7 +5,8 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "grunt test",
-    "prepublish": "grunt compile"
+    "prepublish": "grunt compile",
+    "benchmark": "grunt benchmark:http"
   },
   "repository": {
     "type": "git",

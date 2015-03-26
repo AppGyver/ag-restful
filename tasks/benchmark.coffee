@@ -12,22 +12,35 @@ time = (f) ->
   Promise.resolve(f()).then ->
     (+new Date)-timestamp
 
+markCompletion = (p) ->
+  p.then(
+    (v) ->
+      process.stdout.write '.'
+      v
+    (e) ->
+      process.stdout.write 'x'
+      throw e
+  )
+
+benchmarkResultStream = (f, concurrency, total) ->
+  Bacon.fromArray(i for i in [0..total-1])
+    .flatMapWithConcurrencyLimit(concurrency, (i) ->
+      Bacon.fromPromise markCompletion time(f)
+    )
+
 module.exports = (grunt) ->
 
   benchmark = (f, concurrency, total) -> ->
     grunt.log.ok "Running benchmark..."
     new Promise (resolve) ->
-      Bacon.fromArray(i for i in [0..total])
-        .flatMapWithConcurrencyLimit(concurrency, (i) ->
-          Bacon.fromPromise time(f)
-        )
+      benchmarkResultStream(f, concurrency, total)
         .fold([], (list, time) ->
-          process.stdout.write '.'
           list.push time
           list
         )
         .onValue (times) ->
           console.log ""
+          grunt.log.ok "Requests completed:       #{times.length}"
           grunt.log.ok "Execution times (milliseconds)"
           console.log """
           Minimum:       #{~~stats.min(times)}

@@ -1,6 +1,14 @@
 Promise = require 'bluebird'
 http = require('../src/http')(Promise)
 
+###
+(f: () -> Promise) -> milliseconds
+###
+time = (f) ->
+  timestamp = +new Date
+  Promise.resolve(f()).then ->
+    (+new Date)-timestamp
+
 module.exports = (grunt) ->
   getBenchmarkConfig = ->
     BENCHMARK_URL: process.env.BENCHMARK_URL
@@ -9,13 +17,16 @@ module.exports = (grunt) ->
     CONCURRENCY: process.env.CONCURRENCY ? 10
     REQUESTS: process.env.REQUESTS ? 100
 
-  grunt.registerTask 'benchmark:http', ->
-    done = @async()
-    config = getBenchmarkConfig()
+  requestRunner = (config) -> ->
     http.request('get', config.BENCHMARK_URL, {
       headers:
         steroidsApiKey: config.BENCHMARK_STEROIDS_API_KEY
         steroidsAppId: config.BENCHMARK_STEROIDS_APP_ID
-    }).then (v) ->
+    })
+
+  grunt.registerTask 'benchmark:http', ->
+    done = @async()
+    runRequest = requestRunner getBenchmarkConfig()
+    time(runRequest).then (v) ->
       console.log v
       done()

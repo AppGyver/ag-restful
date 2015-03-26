@@ -1,6 +1,8 @@
 Promise = require 'bluebird'
 http = require('../src/http')(Promise)
 
+stats = require 'simple-statistics'
+
 ###
 (f: () -> Promise) -> milliseconds
 ###
@@ -8,6 +10,24 @@ time = (f) ->
   timestamp = +new Date
   Promise.resolve(f()).then ->
     (+new Date)-timestamp
+
+concurrently = (concurrency = 1) -> (f) ->
+  Promise.all(
+    for i in [0..concurrency]
+      f()
+  )
+
+benchmark = (f, concurrency, total) -> ->
+  concurrently(concurrency)(->
+    time(f)
+  ).then (times) ->
+    console.log """
+    Execution times (milliseconds)
+    ==============================
+    Minimum:    #{~~stats.min(times)}
+    Mean:       #{~~stats.mean(times)}
+    Maximum:    #{~~stats.max(times)}
+    """
 
 module.exports = (grunt) ->
   getBenchmarkConfig = ->
@@ -33,7 +53,8 @@ module.exports = (grunt) ->
     Concurrent requests:      #{config.CONCURRENCY}
     Requests to complete:     #{config.REQUESTS}
     """
-    time(runRequest).then (totalTime) ->
+
+    time(benchmark(runRequest, config.CONCURRENCY, config.REQUESTS)).then (totalTime) ->
       grunt.log.ok """
       Total time to completion: #{totalTime}
       """

@@ -40,8 +40,9 @@ module.exports = (grunt) ->
         )
         .onValue (times) ->
           console.log ""
-          grunt.log.ok "Requests completed:       #{times.length}"
-          grunt.log.ok "Execution times (milliseconds)"
+          grunt.log.ok    "Requests completed:       #{times.length}"
+          grunt.log.error "Requests failed:          #{total - times.length}"
+          grunt.log.ok    "Execution times (milliseconds)"
           console.log """
           Minimum:       #{~~stats.min(times)}
           10% quantile:  #{~~stats.quantile(times, 0.1)}
@@ -52,11 +53,14 @@ module.exports = (grunt) ->
           resolve(times)
 
   getBenchmarkConfig = ->
+    for varName in ['BENCHMARK_URL', 'BENCHMARK_STEROIDS_API_KEY', 'BENCHMARK_STEROIDS_APP_ID']
+      throw new Error ".env needs #{varName}" unless process.env[varName]?
+
     BENCHMARK_URL: process.env.BENCHMARK_URL
     BENCHMARK_STEROIDS_API_KEY: process.env.BENCHMARK_STEROIDS_API_KEY
     BENCHMARK_STEROIDS_APP_ID: process.env.BENCHMARK_STEROIDS_APP_ID
-    CONCURRENCY: process.env.CONCURRENCY ? 10
-    REQUESTS: process.env.REQUESTS ? 100
+    BENCHMARK_CONCURRENCY: process.env.BENCHMARK_CONCURRENCY ? 10
+    BENCHMARK_REQUESTS: process.env.BENCHMARK_REQUESTS ? 100
 
   requestRunner = (config) -> ->
     http.request('get', config.BENCHMARK_URL, {
@@ -71,11 +75,11 @@ module.exports = (grunt) ->
     runRequest = requestRunner config
     grunt.log.ok """
     Benchmarking endpoint:    #{config.BENCHMARK_URL}
-    Concurrent requests:      #{config.CONCURRENCY}
-    Requests to complete:     #{config.REQUESTS}
+    Concurrent requests:      #{config.BENCHMARK_CONCURRENCY}
+    Requests to complete:     #{config.BENCHMARK_REQUESTS}
     """
 
-    time(benchmark(runRequest, config.CONCURRENCY, config.REQUESTS)).then (totalTime) ->
+    time(benchmark(runRequest, config.BENCHMARK_CONCURRENCY, config.BENCHMARK_REQUESTS)).then (totalTime) ->
       grunt.log.ok """
       Total time to completion: #{totalTime}
       """

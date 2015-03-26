@@ -3,6 +3,7 @@ _ = {
 }
 buildRequest = require './http/build-request'
 extractResponseBody = require './http/extract-response-body'
+jobs = require './http/jobs'
 
 module.exports = (Promise) ->
   runRequest = require('./http/run-request')(Promise)
@@ -11,14 +12,14 @@ module.exports = (Promise) ->
   Check a response for the signature of an async job
   ###
   isAsyncJobResponse = (response) ->
-    (response.status is 202) and (response.header['x-proxy-request-id']?)
+    (response.status is jobs.JOB_HTTP_STATUS) and (response.header[jobs.JOB_ID_HEADER]?)
 
   ###
   Given an async job response, mark a request as a monitor on the async job by setting a header
   ###
   markAsAsyncJobMonitorRequest = (asyncJobResponse, requestOptions) ->
     requestOptions.headers ?= {}
-    requestOptions.headers['x-proxy-request-id'] = asyncJobResponse.header['x-proxy-request-id']
+    requestOptions.headers[jobs.JOB_ID_HEADER] = asyncJobResponse.header[jobs.JOB_ID_HEADER]
 
   request = (method, path, options = {}) ->
     ###

@@ -1,3 +1,5 @@
+require('dotenv').load()
+
 module.exports = (grunt) ->
   baseConfig = {
     dir:
@@ -17,5 +19,3 @@ module.exports = (grunt) ->
   require('load-grunt-tasks')(grunt)
 
   grunt.loadTasks baseConfig.dir.tasks
-
-  grunt.task.run 'env'

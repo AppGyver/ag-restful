@@ -25,7 +25,7 @@ build/Release
 node_modules
 
 # Environment variables
-env.json
+.env
 
 # npm release artifacts
 /lib

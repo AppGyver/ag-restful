@@ -1,3 +1,4 @@
+Bacon = require 'baconjs'
 Promise = require 'bluebird'
 http = require('../src/http')(Promise)
 
@@ -11,25 +12,32 @@ time = (f) ->
   Promise.resolve(f()).then ->
     (+new Date)-timestamp
 
-concurrently = (concurrency = 1) -> (f) ->
-  Promise.all(
-    for i in [0..concurrency]
-      f()
-  )
-
-benchmark = (f, concurrency, total) -> ->
-  concurrently(concurrency)(->
-    time(f)
-  ).then (times) ->
-    console.log """
-    Execution times (milliseconds)
-    ==============================
-    Minimum:    #{~~stats.min(times)}
-    Mean:       #{~~stats.mean(times)}
-    Maximum:    #{~~stats.max(times)}
-    """
-
 module.exports = (grunt) ->
+
+  benchmark = (f, concurrency, total) -> ->
+    grunt.log.ok "Running benchmark..."
+    new Promise (resolve) ->
+      Bacon.fromArray(i for i in [0..total])
+        .flatMapWithConcurrencyLimit(concurrency, (i) ->
+          Bacon.fromPromise time(f)
+        )
+        .fold([], (list, time) ->
+          process.stdout.write '.'
+          list.push time
+          list
+        )
+        .onValue (times) ->
+          console.log ""
+          grunt.log.ok "Execution times (milliseconds)"
+          console.log """
+          Minimum:       #{~~stats.min(times)}
+          10% quantile:  #{~~stats.quantile(times, 0.1)}
+          Mean:          #{~~stats.mean(times)}
+          90% quantile:  #{~~stats.quantile(times, 0.9)}
+          Maximum:       #{~~stats.max(times)}
+          """
+          resolve(times)
+
   getBenchmarkConfig = ->
     BENCHMARK_URL: process.env.BENCHMARK_URL
     BENCHMARK_STEROIDS_API_KEY: process.env.BENCHMARK_STEROIDS_API_KEY

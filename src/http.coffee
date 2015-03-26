@@ -12,14 +12,14 @@ module.exports = (Promise) ->
   Check a response for the signature of an async job
   ###
   isAsyncJobResponse = (response) ->
-    (response.status is jobs.JOB_HTTP_STATUS) and (response.header[jobs.JOB_ID_HEADER]?)
+    (response.status is jobs.JOB_HTTP_STATUS) and (response.body?[jobs.JOB_ROOT_KEY]?.id?)
 
   ###
   Given an async job response, mark a request as a monitor on the async job by setting a header
   ###
   markAsAsyncJobMonitorRequest = (asyncJobResponse, requestOptions) ->
     requestOptions.headers ?= {}
-    requestOptions.headers[jobs.JOB_ID_HEADER] = asyncJobResponse.header[jobs.JOB_ID_HEADER]
+    requestOptions.headers[jobs.JOB_ID_HEADER] = asyncJobResponse.body[jobs.JOB_ROOT_KEY].id
 
   request = (method, path, options = {}) ->
     ###

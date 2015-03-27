@@ -5,12 +5,12 @@ http = require('../src/http')(Promise)
 stats = require 'simple-statistics'
 
 ###
-(f: () -> Promise) -> milliseconds
+(f: () -> Promise) -> Promise milliseconds
 ###
 time = (f) ->
   timestamp = +new Date
-  Promise.resolve(f()).then ->
-    (+new Date)-timestamp
+  diff = -> (+new Date)-timestamp
+  Promise.resolve(f()).then(diff, diff)
 
 markCompletion = (p) ->
   p.then(
@@ -25,7 +25,8 @@ markCompletion = (p) ->
 benchmarkResultStream = (f, concurrency, total) ->
   Bacon.fromArray(i for i in [0..total-1])
     .flatMapWithConcurrencyLimit(concurrency, (i) ->
-      Bacon.fromPromise markCompletion time(f)
+      Bacon.fromPromise time ->
+        markCompletion f()
     )
 
 module.exports = (grunt) ->

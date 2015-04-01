@@ -9,6 +9,13 @@ module.exports = (Promise) ->
   runRequest = require('./http/run-request')(Promise)
 
   ###
+  Allow the server to respond with an async job by enabling the corresponding feature header
+  ###
+  allowAsyncJobResponse = (requestOptions) ->
+    requestOptions.headers ?= {}
+    requestOptions.headers[jobs.ASYNC_JOB_FEATURE_HEADER] = true
+
+  ###
   Check a response for the signature of an async job
   ###
   isAsyncJobResponse = (response) ->
@@ -22,6 +29,7 @@ module.exports = (Promise) ->
     requestOptions.headers[jobs.JOB_ID_HEADER] = asyncJobResponse.body[jobs.JOB_ROOT_KEY].id
 
   request = (method, path, options = {}) ->
+    allowAsyncJobResponse options
     ###
     (f: () -> (asyncJobResponse | response)) -> response
     ###

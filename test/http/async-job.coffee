@@ -4,7 +4,9 @@ jobs = require '../../src/http/jobs'
 Express request handler combinator that makes the endpoint appear as an async job to the consumer
 ###
 module.exports = (next) -> (req, res) ->
-  if req.get(jobs.JOB_ID_HEADER) isnt '123'
+  unless req.get(jobs.ASYNC_JOB_FEATURE_HEADER) is 'true'
+    res.status(501).send({error: 'async job feature header not received'}).end()
+  else if req.get(jobs.JOB_ID_HEADER) isnt '123'
     # Backend acknowledges it has accepted job
     job = {}
     job[jobs.JOB_ROOT_KEY] = id: 123

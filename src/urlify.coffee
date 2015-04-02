@@ -1,4 +1,4 @@
-mapValues = require 'lodash-node/modern/objects/mapValues'
+mapValues = require 'lodash-node/modern/object/mapValues'
 
 ###
 Make sure that all scalar values in an input object graph are encoded and ready to be output in a URL

@@ -1,5 +1,5 @@
 _ = {
-  merge: require 'lodash-node/modern/objects/merge'
+  merge: require 'lodash-node/modern/object/merge'
 }
 buildRequest = require './http/build-request'
 extractResponseBody = require './http/extract-response-body'

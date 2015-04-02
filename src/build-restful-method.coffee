@@ -1,5 +1,5 @@
 _ = {
-  defaults: require 'lodash-node/modern/objects/defaults'
+  defaults: require 'lodash-node/modern/object/defaults'
 }
 
 assert = require 'assert-plus'

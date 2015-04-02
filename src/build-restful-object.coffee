@@ -1,7 +1,7 @@
 _ = {
-  partialRight: require 'lodash-node/modern/functions/partialRight'
-  merge: require 'lodash-node/modern/objects/merge'
-  defaults: require 'lodash-node/modern/objects/defaults'
+  partialRight: require 'lodash-node/modern/function/partialRight'
+  merge: require 'lodash-node/modern/object/merge'
+  defaults: require 'lodash-node/modern/object/defaults'
 }
 deepDefaults = _.partialRight _.merge, _.defaults
 

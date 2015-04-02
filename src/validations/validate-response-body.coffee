@@ -1,5 +1,5 @@
 types = require 'ag-types'
-{Failure} = require 'data.validation'
+{Failure} = types.data.Validation
 
 validatorToResponseValidator = (validator) ->
   if typeof validator is 'function'

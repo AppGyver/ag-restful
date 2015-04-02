@@ -1,9 +1,5 @@
-_ = {
-  partialRight: require 'lodash-node/modern/function/partialRight'
-  merge: require 'lodash-node/modern/object/merge'
-  defaults: require 'lodash-node/modern/object/defaults'
-}
-deepDefaults = _.partialRight _.merge, _.defaults
+merge = require 'lodash-node/modern/object/merge'
+deepDefaults = require './options/deep-defaults'
 
 module.exports = (buildRestful, validateResponseBody) ->
   ###
@@ -45,7 +41,7 @@ module.exports = (buildRestful, validateResponseBody) ->
 
       projection(data).map (requestBody) ->
         # Merge sikrits back in to the request body root
-        _.merge {}, requestBody, sikrits
+        merge {}, requestBody, sikrits
 
   # (
   #  defaultRequestOptions: { baseUrl?: String, headers?: Object },

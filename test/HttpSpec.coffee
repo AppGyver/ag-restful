@@ -30,3 +30,8 @@ describe "ag-restful.http", ->
 
         http.request(method, "#{localhost}/path").then (response) ->
           response.status is 200
+
+  describe "transactional", ->
+    describe "request()", ->
+      jsc.property "yields a runnable", arbitraryHttpMethod, (method) ->
+        'function' is typeof http.transactional.request(method, "/path").run

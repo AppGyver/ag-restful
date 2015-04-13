@@ -52,6 +52,10 @@ module.exports = (Promise) ->
       .then(extractResponseBody)
 
   return http =
+    transactional:
+      request: (args...) ->
+        requestRunner buildRequest args...
+
     ###
     Runs a request and returns the raw superagent response object
 

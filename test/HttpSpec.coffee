@@ -1,5 +1,5 @@
 Promise = require 'bluebird'
-http = require('../src')(Promise).ajax
+{ http } = require('../src')(Promise)
 
 chai = require('chai')
 chai.use(require 'chai-as-promised')

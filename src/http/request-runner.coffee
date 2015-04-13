@@ -5,7 +5,12 @@ module.exports = (Promise, Transaction) ->
   requestRunner: (request: superagent.Request) -> TransactionRunner superagent.Response
   ###
   return requestRunner = (request) ->
-    Transaction.step ->
+    Transaction.step ({ abort }) ->
+      abort ->
+        new Promise (resolve) ->
+          request.once('abort', resolve)
+          request.abort()
+
       new Promise (resolve, reject) ->
         debug "Firing HTTP request", request
         request.end (err, res) ->

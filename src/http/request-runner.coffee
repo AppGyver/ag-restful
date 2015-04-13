@@ -1,8 +1,6 @@
 debug = require('debug')('ag-restful:http')
 
-module.exports = (Promise) ->
-  Transaction = require('ag-transaction')(Promise)
-
+module.exports = (Promise, Transaction) ->
   ###
   requestRunner: (request: superagent.Request) -> TransactionRunner superagent.Response
   ###

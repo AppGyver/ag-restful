@@ -14,7 +14,7 @@ asyncJob = require './http/async-job'
 
 describe "ag-restful.http", ->
   describe "request()", ->
-    jsc.property "performs http request to endpoint with any method", arbitraryHttpMethod, (method) ->
+    jsc.property "performs http request to endpoint", arbitraryHttpMethod, (method) ->
       withServer (app) ->
         app[method] '/path', (req, res) ->
           res.status(200).end()
@@ -27,7 +27,7 @@ describe "ag-restful.http", ->
       jsc.property "yields a runnable", arbitraryHttpMethod, (method) ->
         'function' is typeof http.transactional.request(method, "/path").run
 
-      jsc.property "transparently supports async job protocol with any method", arbitraryHttpMethod, (method) ->
+      jsc.property "transparently supports async job protocol", arbitraryHttpMethod, (method) ->
         withServer (app) ->
           app[method] '/path', asyncJob (req, res) ->
             res.status(200).end()

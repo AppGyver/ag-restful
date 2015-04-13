@@ -6,7 +6,6 @@ chai.use(require 'chai-as-promised')
 chai.should()
 
 jsc = require 'jsverify'
-generators = require './generators'
 
 arbitraryHttpMethod = jsc.elements ['get', 'post', 'put', 'del']
 withServer = require './with-server'

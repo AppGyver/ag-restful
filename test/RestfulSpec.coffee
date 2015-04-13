@@ -10,7 +10,7 @@ chai.should()
 types = require 'ag-types'
 restful = require('../src')(Promise)
 
-withServer = require './with-server'
+withServer = require './helper/with-server'
 localhost = require './http/localhost'
 asyncJob = require './http/async-job'
 

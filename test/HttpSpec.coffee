@@ -8,7 +8,7 @@ chai.should()
 jsc = require 'jsverify'
 
 arbitraryHttpMethod = jsc.elements ['get', 'post', 'put', 'del']
-withServer = require './with-server'
+withServer = require './helper/with-server'
 localhost = require './http/localhost'
 asyncJob = require './http/async-job'
 

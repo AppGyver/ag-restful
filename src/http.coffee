@@ -1,6 +1,3 @@
-_ = {
-  merge: require 'lodash-node/modern/object/merge'
-}
 buildRequest = require './http/build-request'
 extractResponseBody = require './http/extract-response-body'
 jobs = require './http/jobs'

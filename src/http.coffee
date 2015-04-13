@@ -6,7 +6,10 @@ extractResponseBody = require './http/extract-response-body'
 jobs = require './http/jobs'
 
 module.exports = (Promise) ->
-  runRequest = require('./http/run-request')(Promise)
+  requestRunner = require('./http/request-runner')(Promise)
+  runRequest = (requestBuilder) ->
+    requestRunner(requestBuilder).run (t) ->
+      t.done
 
   ###
   Allow the server to respond with an async job by enabling the corresponding feature header

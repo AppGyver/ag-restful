@@ -31,7 +31,7 @@ module.exports = (Promise) ->
   request = (method, path, options = {}) ->
     allowAsyncJobResponse options
     ###
-    (f: () -> (asyncJobResponse | response)) -> response
+    (f: () -> Promise (asyncJobResponse | response)) -> Promise response
     ###
     retryUntilComplete = (f) ->
       f().then (response) ->
@@ -49,10 +49,18 @@ module.exports = (Promise) ->
       .then(extractResponseBody)
 
   return http =
-    # Returns the raw HTTP request
+    ###
+    Runs a request and returns the raw superagent response object
+
+    (method, url, options?) -> Promise Response
+    ###
     request: request
 
-    # These will always return the request data
+    ###
+    Convenience functions that run a request and return its body as JSON
+
+    (url, data?) -> Promise Object
+    ###
     get: requestDataByMethod 'get'
     post: requestDataByMethod 'post'
     del: requestDataByMethod 'del'

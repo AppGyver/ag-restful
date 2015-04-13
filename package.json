@@ -49,6 +49,7 @@
     }
   },
   "dependencies": {
+    "ag-transaction": "^0.1.1",
     "ag-types": "0.3.1",
     "assert-plus": "0.1.5",
     "debug": "^2.1.3",

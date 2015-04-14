@@ -44,6 +44,7 @@ describe "ag-restful.http", ->
               res.status(200).end()
 
           http.transactional.request(method, "#{localhost}/path").run (t) ->
+            t.done.should.be.rejected
             Promise.delay(10).then ->
               t.abort().then ->
                 true

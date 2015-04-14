@@ -26,7 +26,7 @@ module.exports = (Promise) ->
   Transaction = require('ag-transaction')(Promise)
   requestRunner = require('./http/request-runner')(Promise, Transaction)
 
-  retryingRequestRunner = do ->
+  asyncJobRequestRunner = do ->
     (method, path, options = {}) ->
       allowAsyncJobResponse options
       ###
@@ -50,7 +50,7 @@ module.exports = (Promise) ->
           requestRunner buildRequest(method, path, options)
 
   runRequest = (args...) ->
-    retryingRequestRunner(args...).run (t) ->
+    asyncJobRequestRunner(args...).run (t) ->
       t.done
 
   requestDataByMethod = (method) -> (path, options = {}) ->
@@ -59,7 +59,7 @@ module.exports = (Promise) ->
 
   return http =
     transactional:
-      request: retryingRequestRunner
+      request: asyncJobRequestRunner
 
     ###
     Runs a request and returns the raw superagent response object

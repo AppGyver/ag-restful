@@ -40,9 +40,10 @@ describe "ag-restful.http", ->
       jsc.property "allows aborting the request", arbitraryHttpMethod, (method) ->
         withServer (app) ->
           app[method] '/path', asyncJob (req, res) ->
-            res.status(200).end()
+            Promise.delay(100).then ->
+              res.status(200).end()
 
-          http.transactional.request(method, "#{localhost}/path").run((t) ->
-            t.abort()
-          ).then ->
-            true
+          http.transactional.request(method, "#{localhost}/path").run (t) ->
+            Promise.delay(10).then ->
+              t.abort().then ->
+                true

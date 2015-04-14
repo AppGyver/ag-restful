@@ -39,6 +39,12 @@ describe "ag-restful.http", ->
 
       jsc.property "allows aborting the request", arbitraryHttpMethod, (method) ->
         withServer (app) ->
+          ###
+          KLUDGE: The current transaction doesn't handle immediate abortions.
+          Also, we want to verify whether we can actually abort the ongoing
+          HTTP request. To do this, we add a delay to the abort sufficiently
+          long so that we have time to reach the HTTP request part.
+          ###
           app[method] '/path', asyncJob (req, res) ->
             Promise.delay(100).then ->
               res.status(200).end()

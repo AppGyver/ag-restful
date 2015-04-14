@@ -5,7 +5,7 @@ chai.should()
 types = require 'ag-types'
 restful = require('../src')(require 'bluebird')
 
-withServer = require './with-server'
+withServer = require './helper/with-server'
 express = require 'express'
 localhost = require './http/localhost'
 

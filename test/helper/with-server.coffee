@@ -1,7 +1,7 @@
 Promise = require 'bluebird'
 express = require "express"
 
-PORT = require './http/port'
+PORT = require '../http/port'
 
 module.exports = withServer = (f) ->
   app = express()

@@ -25,25 +25,24 @@ module.exports = (Promise) ->
   Transaction = require('ag-transaction')(Promise)
   requestRunner = require('./request-runner')(Promise, Transaction)
 
-  asyncJobRequestRunner = do ->
-    (method, path, options = {}) ->
-      allowAsyncJobResponse options
-      ###
-      (f: () ->
-        TransactionRunner ((superagent.Response & asyncJob) | superagent.Response)
-      ) -> TransactionRunner superagent.Response
-      ###
-      retryUntilComplete = (f) ->
-        f().flatMapDone (response) ->
-          if !isAsyncJobResponse response
-            Transaction.unit response
-          else
-            markAsAsyncJobMonitorRequest response, options
-            retryUntilComplete f
+  return asyncJobRequestRunner = (method, path, options = {}) ->
+    allowAsyncJobResponse options
+    ###
+    (f: () ->
+      TransactionRunner ((superagent.Response & asyncJob) | superagent.Response)
+    ) -> TransactionRunner superagent.Response
+    ###
+    retryUntilComplete = (f) ->
+      f().flatMapDone (response) ->
+        if !isAsyncJobResponse response
+          Transaction.unit response
+        else
+          markAsAsyncJobMonitorRequest response, options
+          retryUntilComplete f
 
-      # NOTE: Node will emit faux 'socket hang up' errors if request is built
-      # but never ran. Avoid this by starting from an empty transaction and
-      # creating the request only when we're actually going to run.
-      Transaction.empty.flatMapDone ->
-        retryUntilComplete ->
-          requestRunner buildRequest(method, path, options)
+    # NOTE: Node will emit faux 'socket hang up' errors if request is built
+    # but never ran. Avoid this by starting from an empty transaction and
+    # creating the request only when we're actually going to run.
+    Transaction.empty.flatMapDone ->
+      retryUntilComplete ->
+        requestRunner buildRequest(method, path, options)

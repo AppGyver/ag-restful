@@ -8,7 +8,7 @@ buildRequest = require './build-request'
 We want to be able to modify headers on the options object. However, there's
 data that is potentially uncloneable. Let's do a partial clone.
 ###
-cloneOptions = (requestOptions) ->
+partialCloneOptions = (requestOptions) ->
   defaults(
     # Start with specific cloned properties
     {
@@ -42,7 +42,7 @@ module.exports = (Promise) ->
   requestRunner = require('./request-runner')(Promise, Transaction)
 
   return asyncJobRequestRunner = (method, path, options = {}) ->
-    options = cloneOptions options
+    options = partialCloneOptions options
     allowAsyncJobResponse options
     ###
     (f: () ->

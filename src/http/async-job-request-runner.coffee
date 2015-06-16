@@ -23,7 +23,6 @@ cloneOptions = (requestOptions) ->
 Allow the server to respond with an async job by enabling the corresponding feature header
 ###
 allowAsyncJobResponse = (requestOptions) ->
-  requestOptions.headers ?= {}
   requestOptions.headers[jobs.ASYNC_JOB_FEATURE_HEADER] = true
 
 ###
@@ -36,7 +35,6 @@ isAsyncJobResponse = (response) ->
 Given an async job response, mark a request as a monitor on the async job by setting a header
 ###
 markAsAsyncJobMonitorRequest = (asyncJobResponse, requestOptions) ->
-  requestOptions.headers ?= {}
   requestOptions.headers[jobs.JOB_ID_HEADER] = asyncJobResponse.body[jobs.JOB_ROOT_KEY].id
 
 module.exports = (Promise) ->

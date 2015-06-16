@@ -5,16 +5,19 @@ chai = require('chai')
 chai.use(require 'chai-as-promised')
 chai.should()
 
-jsc = require 'jsverify'
+deepEqual = require 'deep-equal'
+deepClone = require 'lodash-node/modern/lang/cloneDeep'
 
-arbitraryHttpMethod = jsc.elements ['get', 'post', 'put', 'del']
+jsc = require 'jsverify'
+arbitrary = require './data/arbitrary'
+
 withServer = require './helper/with-server'
 localhost = require './http/localhost'
 asyncJob = require './http/async-job'
 
 describe "ag-restful.http", ->
   describe "request()", ->
-    jsc.property "performs http request to endpoint", arbitraryHttpMethod, (method) ->
+    jsc.property "performs http request to endpoint", arbitrary.httpMethod, (method) ->
       withServer (app) ->
         app[method] '/path', (req, res) ->
           res.status(200).end()
@@ -22,12 +25,23 @@ describe "ag-restful.http", ->
         http.request(method, "#{localhost}/path").then (response) ->
           response.status is 200
 
+    describe "regressions", ->
+      jsc.property "does not modify option arguments", arbitrary.httpMethod, arbitrary.requestOptions, (method, options) ->
+        options = deepClone options
+        withServer (app) ->
+          app[method] '/path', (req, res) ->
+            res.status(200).end()
+
+          originalOptions = deepClone options
+          http.request(method, "#{localhost}/path", options).then ->
+            deepEqual(originalOptions, options)
+
   describe "transactional", ->
     describe "request()", ->
-      jsc.property "yields a runnable", arbitraryHttpMethod, (method) ->
+      jsc.property "yields a runnable", arbitrary.httpMethod, (method) ->
         'function' is typeof http.transactional.request(method, "/path").run
 
-      jsc.property "transparently supports async job protocol", arbitraryHttpMethod, (method) ->
+      jsc.property "transparently supports async job protocol", arbitrary.httpMethod, (method) ->
         withServer (app) ->
           app[method] '/path', asyncJob (req, res) ->
             res.status(200).end()
@@ -37,7 +51,7 @@ describe "ag-restful.http", ->
           ).then (response) ->
             response.status is 200
 
-      jsc.property "allows aborting the request", arbitraryHttpMethod, (method) ->
+      jsc.property "allows aborting the request", arbitrary.httpMethod, (method) ->
         withServer (app) ->
           ###
           KLUDGE: The current transaction doesn't handle immediate abortions.

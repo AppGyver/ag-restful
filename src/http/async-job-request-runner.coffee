@@ -1,5 +1,23 @@
+defaults = require 'lodash-node/modern/object/defaults'
+deepClone = require 'lodash-node/modern/lang/cloneDeep'
+
 jobs = require './jobs'
 buildRequest = require './build-request'
+
+###
+We want to be able to modify headers on the options object. However, there's
+data that is potentially uncloneable. Let's do a partial clone.
+###
+cloneOptions = (requestOptions) ->
+  defaults(
+    # Start with specific cloned properties
+    {
+      headers: deepClone (requestOptions.headers ? {})
+      query: deepClone (requestOptions.query ? {})
+    },
+    # Leave the rest up to the original object's values
+    requestOptions
+  )
 
 ###
 Allow the server to respond with an async job by enabling the corresponding feature header
@@ -26,6 +44,7 @@ module.exports = (Promise) ->
   requestRunner = require('./request-runner')(Promise, Transaction)
 
   return asyncJobRequestRunner = (method, path, options = {}) ->
+    options = cloneOptions options
     allowAsyncJobResponse options
     ###
     (f: () ->

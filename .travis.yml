@@ -1,21 +1,21 @@
 sudo: false
 cache:
   directories:
-    - node_modules
+  - node_modules
 language: node_js
 node_js:
-- '0.10'
+- '0.12'
 before_install: npm install -g grunt-cli
 after_success: grunt travis
 deploy:
   provider: npm
-  email: eevert.saukkokoski@appgyver.com
+  email: hostmaster+npm@appgyver.com
   on:
     tags: true
-    all_branches: true
+    branch: master
     repo: AppGyver/ag-restful
   api_key:
-    secure: CzQNPJu1ztrkw5rp9NyTC9/QVr6xFl7Fm264xiJ0czi6mjUwtN97RIArKzbGbzkaTHwtZVQ+iyc3tb2ZE2/oujbWClQrgOpLKGPsmz/Nk32gBLk5YOljc6QS3INuQ3Z44fPZY9Pkveq1yghpZN17hwwnXtjGAAyLOuSYJeIbwNs=
+    secure: CBAyyWH0VZoz6LDYHHw1rYFVxfbN5KyqbAbGqS1N5Hq0D3qPV0+p3CsfiZ/erwOIngtvipa6NUEGHZ1xYHy+AVNv0fTBoKdpL51yli4118rxu78eCqNp+Ey/AoR2YF5gEzFOhHx2WesrKOs4t3+NBykRQbvgyInz5mTNIW4PG7I=
 env:
   global:
     secure: fuaL82688JIAFA3iRmSl68s1YDW5hdl5Xgvp2IMETpG/lwePcsLG2+ek/fd09RWo+PgI3al3Xt4XI3XtL7mAR7z6bU7DNZoOBzNV3opWCjBK4BHKrXiyfLw3r4TB9UsNTX15T2XwelEQbOkUROIHwU4z1bz/K8jRhlk5LBRCeUc=

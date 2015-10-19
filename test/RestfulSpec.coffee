@@ -1,4 +1,6 @@
 Promise = require 'bluebird'
+Bacon = require 'baconjs'
+
 fs = require 'fs'
 bodyparser = require "body-parser"
 formidable = require 'formidable'
@@ -8,7 +10,7 @@ chai.use(require 'chai-as-promised')
 chai.should()
 
 types = require 'ag-types'
-restful = require('../src')(Promise)
+restful = require('../src')(Promise, Bacon)
 
 withServer = require './helper/with-server'
 localhost = require './http/localhost'

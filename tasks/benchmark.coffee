@@ -1,6 +1,6 @@
 Bacon = require 'baconjs'
 Promise = require 'bluebird'
-http = require('../src/http')(Promise)
+http = require('../src/http')(Promise, Bacon)
 
 stats = require 'simple-statistics'
 

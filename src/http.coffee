@@ -1,14 +1,32 @@
 extractResponseBody = require './http/extract-response-body'
 
-module.exports = (Promise) ->
+module.exports = (Promise, Bacon) ->
   asyncJobRequestRunner = require('./http/async-job-request-runner')(Promise)
+
+  requests = new Bacon.Bus
+  requestStarted = (method, url, options, done) ->
+    requests.push {
+      method
+      url
+      options
+      done
+    }
 
   runRequest = (args...) ->
     asyncJobRequestRunner(args...).run (t) ->
+      [ method, url, options ] = args
+
+      requestStarted(
+        method
+        url
+        options || {}
+        t.done
+      )
+
       t.done
 
-  requestDataByMethod = (method) -> (path, options = {}) ->
-    runRequest(method, path, options)
+  requestDataByMethod = (method) -> (url, options = {}) ->
+    runRequest(method, url, options)
       .then(extractResponseBody)
 
   return http =
@@ -31,3 +49,13 @@ module.exports = (Promise) ->
     post: requestDataByMethod 'post'
     del: requestDataByMethod 'del'
     put: requestDataByMethod 'put'
+
+    ###
+    Bacon.Bus {
+      method: String
+      path: String
+      options: Object
+      done: Promise superagent.Response
+    }
+    ###
+    requests: requests

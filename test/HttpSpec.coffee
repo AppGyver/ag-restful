@@ -1,5 +1,7 @@
 Promise = require 'bluebird'
-{ http } = require('../src')(Promise)
+Bacon = require 'baconjs'
+
+{ http } = require('../src')(Promise, Bacon)
 
 chai = require('chai')
 chai.use(require 'chai-as-promised')
@@ -16,6 +18,32 @@ localhost = require './http/localhost'
 asyncJob = require './http/async-job'
 
 describe "ag-restful.http", ->
+  describe "requests", ->
+    it 'is a stream', ->
+      http.should.have.property('requests').have.property('onValue').be.a 'function'
+
+    jsc.property "contains an entry for each request started", arbitrary.httpMethod, arbitrary.requestOptions, (method, options) ->
+      options = deepClone options
+      withServer (app) ->
+        foundRequestEvent = new Promise (resolve) ->
+          originalOptions = deepClone options
+          http
+            .requests
+            .filter((details) ->
+              (details.method is method) && \
+                ((details.url || '').indexOf('/path') isnt -1) && \
+                (deepEqual originalOptions, details.options)
+            )
+            .take(1)
+            .onEnd resolve
+
+        app[method] '/path', (req, res) ->
+          foundRequestEvent.then ->
+            res.status(200).end()
+
+        http.request(method, "#{localhost}/path", options).then (response) ->
+          response.status is 200
+
   describe "request()", ->
     jsc.property "performs http request to endpoint", arbitrary.httpMethod, (method) ->
       withServer (app) ->

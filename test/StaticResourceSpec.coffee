@@ -1,9 +1,12 @@
+Promise = require 'bluebird'
+Bacon = require 'baconjs'
+
 chai = require('chai')
 chai.use(require 'chai-as-promised')
 chai.should()
 
 types = require 'ag-types'
-restful = require('../src')(require 'bluebird')
+restful = require('../src')(Promise, Bacon)
 
 withServer = require './helper/with-server'
 express = require 'express'

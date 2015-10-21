@@ -2,7 +2,6 @@ defaults = require 'lodash-node/modern/object/defaults'
 deepClone = require 'lodash-node/modern/lang/cloneDeep'
 
 jobs = require './jobs'
-buildRequest = require './build-request'
 
 ###
 We want to be able to modify headers on the options object. However, there's
@@ -37,11 +36,11 @@ Given an async job response, mark a request as a monitor on the async job by set
 markAsAsyncJobMonitorRequest = (asyncJobResponse, requestOptions) ->
   requestOptions.headers[jobs.JOB_ID_HEADER] = asyncJobResponse.body[jobs.JOB_ROOT_KEY].id
 
-module.exports = (Promise) ->
+module.exports = (Promise, requestStarted) ->
   Transaction = require('ag-transaction')(Promise)
-  requestRunner = require('./request-runner')(Promise, Transaction)
+  requestStep = require('./request-step')(Promise, Transaction.step, requestStarted)
 
-  return asyncJobRequestRunner = (method, path, options = {}) ->
+  return asyncJobRequestTransaction = (method, url, options = {}) ->
     options = partialCloneOptions options
     allowAsyncJobResponse options
     ###
@@ -62,4 +61,4 @@ module.exports = (Promise) ->
     # creating the request only when we're actually going to run.
     Transaction.empty.flatMapDone ->
       retryUntilComplete ->
-        requestRunner buildRequest(method, path, options)
+        requestStep method, url, options

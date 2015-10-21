@@ -30,9 +30,11 @@ describe "ag-restful.http", ->
           http
             .requests
             .filter((details) ->
+              # Note: headers will not match because they're modified while
+              # sending; only check query.
               (details.method is method) && \
                 ((details.url || '').indexOf('/path') isnt -1) && \
-                (deepEqual originalOptions, details.options)
+                (deepEqual originalOptions.query, details.options.query)
             )
             .take(1)
             .onEnd resolve

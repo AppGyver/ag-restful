@@ -1,8 +1,6 @@
 extractResponseBody = require './http/extract-response-body'
 
 module.exports = (Promise, Bacon) ->
-  asyncJobRequestRunner = require('./http/async-job-request-runner')(Promise)
-
   requests = new Bacon.Bus
   requestStarted = (method, url, options, done) ->
     requests.push {
@@ -12,17 +10,10 @@ module.exports = (Promise, Bacon) ->
       done
     }
 
+  asyncJobRequestTransaction = require('./http/async-job-request-transaction')(Promise, requestStarted)
+
   runRequest = (args...) ->
-    asyncJobRequestRunner(args...).run (t) ->
-      [ method, url, options ] = args
-
-      requestStarted(
-        method
-        url
-        options || {}
-        t.done
-      )
-
+    asyncJobRequestTransaction(args...).run (t) ->
       t.done
 
   requestDataByMethod = (method) -> (url, options = {}) ->
@@ -31,7 +22,7 @@ module.exports = (Promise, Bacon) ->
 
   return http =
     transactional:
-      request: asyncJobRequestRunner
+      request: asyncJobRequestTransaction
 
     ###
     Runs a request and returns the raw superagent response object

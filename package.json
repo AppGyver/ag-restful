@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/AppGyver/ag-restful",
   "devDependencies": {
-    "baconjs": "^0.7.53",
+    "baconjs": "^0.7.83",
     "bluebird": "2.3.11",
     "body-parser": "^1.9.0",
     "chai": "^1.9.2",

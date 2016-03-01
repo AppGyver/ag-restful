@@ -36,6 +36,7 @@ module.exports = (buildRestful, validateResponseBody) ->
       # Stash sikrits away
       sikrits = {}
       for key, value of data when 0 is key.indexOf '__'
+        continue if key is '__appgyver_acl'
         sikrits[key] = value
         delete data[key]
 

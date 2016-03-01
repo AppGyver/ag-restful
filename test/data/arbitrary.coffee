@@ -7,7 +7,7 @@ isAlnumString = (string) ->
 
 arbitraryKeyString = jsc.bless jsc.suchthat jsc.asciinestring, isAlnumString
 
-arbitraryKeyValuePair = jsc.pair(arbitraryKeyString, jsc.oneof(jsc.string, jsc.bool, jsc.number)).smap(
+arbitraryKeyValuePair = jsc.pair(arbitraryKeyString, jsc.oneof(jsc.asciistring, jsc.bool, jsc.number)).smap(
   ([key, value]) ->
     object = {}
     object[key] = value

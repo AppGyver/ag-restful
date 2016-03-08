@@ -39,7 +39,7 @@
     "grunt-mocha-cov": "^0.3.0",
     "jsverify": "^0.6.0-beta.2",
     "load-grunt-config": "^0.13.2",
-    "load-grunt-tasks": "^0.6.0",
+    "load-grunt-tasks": "^3.4.1",
     "simple-statistics": "^0.9.1"
   },
   "config": {
